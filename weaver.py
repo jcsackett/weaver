@@ -18,10 +18,6 @@ def init(args):
             os.path.join(target_dir, 'settings.py')
         )
 
-commands = {
-    'init':init,
-}
-
 if __name__ == '__main__':
     cmd = sys.argv[1]
     args = sys.argv[2:]
