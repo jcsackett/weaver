@@ -1,7 +1,20 @@
+PROJECT_NAME = ''
 PROJECT_HOME = ''
 CODE_HOME = ''
 
 REPO = ''
+
+DIRECTORIES = (
+	'/home/websites/',
+	'/home/websites/lighttpd/',
+	'/home/websites/lighttpd/%s/' % PROJECT_NAME,
+	'/home/websites/lighttpd/%s/site_media/' % PROJECT_NAME, 
+	'/home/websites/lighttpd/%s/lighttpdcache/ % PROJECT_NAME',
+	'/home/websites/%s/' % PROJECT_NAME, 
+	'/home/websites/%s/logs/' % PROJECT_NAME, 
+	'/home/websites/%s/logs/apache/' % PROJECT_NAME,
+	'/var/log/lighttpd/%s/' % PROJECT_NAME,
+)
 
 LIGHTTPD_USER =  ('', '', '') #(STAGING, INTERNAL, PRODUCTION)
 APACHE_USER =    ('', '', '') #(STAGING, INTERNAL, PRODUCTION)
@@ -12,5 +25,9 @@ MYSQL_PASSWORD = ('', '', '')
 SERVER =		 ('', '', '')
 USER = 			 ('', '', '')
 LIGHTTPD_PORTS = ('', '', '')
-SUBDOMAIN -      ('', '', '')
+SUBDOMAIN =      ('', '', '')
 APACHE_PORTS =   ('', '', '')
+
+OWNER =			 ('', '', '')
+GROUP =			 ('', '', '')
+
