@@ -2,32 +2,24 @@ PROJECT_NAME = ''
 PROJECT_HOME = ''
 CODE_HOME = ''
 
+REPO_TYPE = '' #one of git, hg, or svn
 REPO = ''
 
-DIRECTORIES = (
-	'/home/websites/',
-	'/home/websites/lighttpd/',
-	'/home/websites/lighttpd/%s/' % PROJECT_NAME,
-	'/home/websites/lighttpd/%s/site_media/' % PROJECT_NAME, 
-	'/home/websites/lighttpd/%s/lighttpdcache/ % PROJECT_NAME',
-	'/home/websites/%s/' % PROJECT_NAME, 
-	'/home/websites/%s/logs/' % PROJECT_NAME, 
-	'/home/websites/%s/logs/apache/' % PROJECT_NAME,
-	'/var/log/lighttpd/%s/' % PROJECT_NAME,
-)
+#SERVER BASED SETUP INFO
+# Each of the following variables consists of a three part tuple, defining
+# that variable for each server in STAGING, INTERNAL, and PRODUCTION
 
-LIGHTTPD_USER =  ('', '', '') #(STAGING, INTERNAL, PRODUCTION)
-APACHE_USER =    ('', '', '') #(STAGING, INTERNAL, PRODUCTION)
+LIGHTTPD_USER =  ('', '', '') #The lighty user for the server (e.g. www-data)
+APACHE_USER =    ('', '', '') #The apache user for the server (e.g. www-data)
 
-MYSQL_USER =     ('', '', '')
-MYSQL_PASSWORD = ('', '', '')
+MYSQL_USER =     ('', '', '') #The mysql user for the project
+MYSQL_PASSWORD = ('', '', '') #The password for the mysql user on the project
 
-SERVER =		 ('', '', '')
-USER = 			 ('', '', '')
-LIGHTTPD_PORTS = ('', '', '')
-SUBDOMAIN =      ('', '', '')
-APACHE_PORTS =   ('', '', '')
+SERVER =		 ('', '', '') #The ip or servername for the server
+USER = 			 ('', '', '') #The user for the server
+SITE_URL = 		 ('', '', '') #The url the site is hosted at on the server (http://example.com, http://example.com:8080, http://bad.example.com)
+APACHE_PORT =    ('', '', '') #The port apache is listening on
 
-OWNER =			 ('', '', '')
-GROUP =			 ('', '', '')
+OWNER =			 ('', '', '') #The user who should own the site files, logs, etc
+GROUP =			 ('', '', '') #The group who should own the site files, logs, etc
 
