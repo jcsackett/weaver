@@ -18,8 +18,19 @@ def init(args):
             os.path.join(target_dir, 'settings.py')
         )
 
+def build(args):
+    pass
+    
+commands = {
+    'init':init,
+    'build':build
+}
+
 if __name__ == '__main__':
     cmd = sys.argv[1]
     args = sys.argv[2:]
     
-    commands[cmd](args)
+    try:
+        commands[cmd](args)
+    except KeyError:
+        print '%s is not a weaver command.' % cmd
