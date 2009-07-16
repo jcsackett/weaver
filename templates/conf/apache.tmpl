@@ -1,0 +1,26 @@
+#
+# quantile teachers assistant
+#
+
+<VirtualHost *:{{port}}>
+    ServerAdmin {{admin}}
+
+    KeepAlive 0
+    #Indexes and Directory Root
+    DirectoryIndex index.html
+    DocumentRoot /home/websites/{{project}}
+    LimitRequestBody 2097152
+
+    WSGIScriptAlias / /home/websites/{{project}}/{{code}}/wsgi_handler.py
+    WSGIDaemonProcess {{djangoprocess}} user=www-data group=www-data processes=1 threads=10
+    WSGIProcessGroup djangoa
+    
+    <Directory /home/websites/{{project}}/{{code}}>
+        Order allow,deny
+	Allow from all
+    </Directory>
+
+    #Logs
+    ErrorLog /home/websites/{{project}}/logs/apache/error.log
+    CustomLog /home/websites/{{project}}/logs/apache/access.log combined
+</VirtualHost>
