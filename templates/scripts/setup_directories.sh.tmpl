@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "creating necessary folders for deployment..."
-for dir in {{ site_folders }}
+for dir in /home/websites/lighttpd/{{PROJECT}}/ /home/websites/lighttpd/{{PROJECT}}/ /home/websites/lighttpd/{{PROJECT}}/cache /home/websites/{{PROJECT}}/ /home/websites/{{PROJECT}}/logs/ /home/websites/{{PROJECT}}/logs/apache/ /home/websites/lighttpd/{{PROJECT}}/logs/
 do
     if [[ -d $dir ]]; then
         echo $dir "already exists."
