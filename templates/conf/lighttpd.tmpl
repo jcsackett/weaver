@@ -1,0 +1,33 @@
+$HTTP["host"] =~ {{url}} {
+    
+    $HTTP["remoteip"] =~ "127.0.0.1" {
+        alias.url += ( 
+            "/doc/" => "/usr/share/doc/",
+            "/images/" => "/usr/share/images/"
+        )
+        $HTTP["url"] =~ "^/doc/|^/images/" {
+            dir-listing.activate = "enable"
+        }
+    }
+    
+    alias.url += (
+        "/m/" => "/home/websites/lighttpd/{{project}}/site_media/",
+    )
+        
+        $HTTP["url"] !~ "(/m/)" {
+            proxy.server = ("" =>
+            (( "host" => "127.0.0.1",
+               "port" => {{port}} 
+            ))
+            )
+        }
+    
+    server.document-root = "/home/websites/lighttpd/{{project}}/site_media/"
+    compress.cache-dir   = "/home/websites/lighttpd/{{project}}/cache/"
+    url.rewrite-once     = (
+                            "^/favicon.ico$" => "/m/im/favicon.ico",
+                            "^/robots.txt$"  => "/m/robots.txt",
+                            )
+    server.errorlog    = "/home/websites/lighttpd/{{project}}/logs/error.log"
+    accesslog.filename = "/home/websites/lighttpd/{{project}}/logs/access.log"
+}
