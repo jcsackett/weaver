@@ -10,6 +10,7 @@ REPO = ''
 
 LIGHTTPD_USER =  ('', '', '') #The lighty user for the server (e.g. www-data)
 APACHE_USER =    ('', '', '') #The apache user for the server (e.g. www-data)
+ADMIN = 	 ('', '', '') #The admin email for the apache instance (e.g. webmaster@example.com)
 
 MYSQL_USER =     ('', '', '') #The mysql user for the project
 MYSQL_PASSWORD = ('', '', '') #The password for the mysql user on the project
@@ -17,8 +18,8 @@ MYSQL_PASSWORD = ('', '', '') #The password for the mysql user on the project
 SERVER =		 ('', '', '') #The ip or servername for the server
 USER = 			 ('', '', '') #The user for the server
 SITE_URL = 		 ('', '', '') #The url the site is hosted at on the server (http://example.com, http://example.com:8080, http://bad.example.com)
-APACHE_PORT =    ('', '', '') #The port apache is listening on
-
+APACHE_PORT =    	 ('', '', '') #The port apache is listening on
+DJANGO_PROCESS =	 ('', '', '') #The process daemon for the wsgi django handler
 OWNER =			 ('', '', '') #The user who should own the site files, logs, etc
 GROUP =			 ('', '', '') #The group who should own the site files, logs, etc
 
