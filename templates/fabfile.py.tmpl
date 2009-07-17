@@ -1,0 +1,111 @@
+config.fab_hosts = [{{staging}}, {{production}}, {{internal}}]
+
+def internal():
+    config.fab_hosts = [{{internal}}]
+    config.db_user = {{internal_db_user}}
+    config.db_password = {internal_db_password}}
+    config.conf = 'internal'
+    
+def staging():
+    config.fab_hosts = [{{staging}}]
+    config.db_user = {{staging_db_user}}
+    config.db_password = {{staging_db_password}}
+    config.conf = 'staging'
+    
+def production():
+    config.fab_hosts = [{{production}}]
+    config.db_user = {{production_db_user}}
+    config.db_password = {{production_db_password}}
+    config.conf = 'production'
+    
+def init():
+    #create the database
+    run('echo "create database {{db}};" | mysql --user=$(db_user) --password=$(db_password)')
+
+    #create the folders
+    put('scripts/setup_directories.sh', 'setup_directories.sh')
+    run('chmod +x setup_directories.sh')
+    run('./setup_directories.sh && rm setup_directories.sh')
+    
+    #checkout the code
+    run('cd /home/websites/{{project}}/ && {{repo_cmd}} {{repo}} {{code}}')
+    
+    #create syslinks
+    put('scripts/setup_syslinks.sh', 'setup_syslinks.sh')
+    run('chmod +x setup_syslinks.sh')
+    run('./setup_syslinks.sh && rm setup_syslinks.sh')
+    
+    #push up conf files
+    put('conf/$(conf)/99-{{project}}.conf', '99-{{project}}.conf')
+    put('conf/$(conf)/{{project}}', '{{project}}')
+    sudo('mv 99-{{project}}.conf /etc/lighttpd/conf-available && mv {{project}} /etc/apache2/sites-available')
+    
+    #push up local settings and start setting up database
+    put('conf/$(conf)/settings_local.py', 'settings_local.py')
+    run('mv settings_local.py /home/websites/{{project}}/{{code}}')
+    run('cd /home/websites/{{project}}/{{code}} && python manage.py syncdb --noinput')
+
+    #enable config files
+    sudo('a2ensite {{project}}')
+    sudo('lighty-enable-mod {{project}}')
+    force_permissions()
+
+    print 'Remember if you\'ve deployed to production, you need to manually link admin_media into the lighttpd site media folder.'
+    print 'Remember you need to call the restart operation to start the server once everything is initialized.'
+
+def force_permissions():
+    #cover our butts, permissions wise
+    sudo('chown -R www-data:www-data /home/websites/{{project}}')
+    sudo('chown -R www-data:www-data /home/websites/lighttpd/{{project}}')
+    sudo('chmod -R 775 /home/websites/{{project}}')
+    sudo('chmod -R 775 /home/websites/lighttpd/{{project}}')
+    
+def update():
+    run('cd /home/websites/{{project}}/{{code}} && svn up')
+    run('cd /home/websites/{{project}}/{{code}} && python manage.py syncdb --noinput')
+    print "Please note you need to execute a 'restart' command before your code changes will work."
+    
+def db_kill():
+    #TODO: Make sure this cannot run without db-backup being set
+    run('echo "drop database {{db}};" | mysql --user=$(db_user) --password=$(db_password)')
+
+def db_backup():
+    run('mysqldump --user=$(db_user) --password=$(db_password) {{db}} > ~/{{db}}.sql')
+    run('gzip {{db}}.sql')
+    download('{{db}}.sql.gz', '{{db}}_backup.sql.gz', fail='abort')
+    #TODO: Setup backup successful flag
+    
+def db_restore():
+    pass
+
+def site_kill():
+    #TODO: Require backup flag
+    sudo('rm -rf /home/websites/{{project}}')
+    sudo('rm -rf /home/websites/lighttpd/{{project}}')
+    sudo('a2dissite {{project}}')
+    sudo('lighty-disable-mod {{project}}')
+    sudo('rm /etc/apache2/sites-available/{{project}}')
+    sudo('rm /etc/lighttpd/conf-available/99-{{project}}.conf')
+
+
+def site_backup():
+    """Downloads a tarball of the site to the fabric user."""
+    run("cd /home/websites/ && tar -cvf ~/{{project}}.tar {{project}}")
+    run("gzip {{project}}.tar")
+    download('{{project}}.tar.gz', '${{project}}_backup.tar.gz', fail='abort')
+    #TODO: Setup backup successful flag
+
+def site_restore():
+    pass
+    
+def offline():
+    """Replaces the site with a static "Site is down for maintenance" page."""
+    raise NotImplemented('This is on the wishlist.')
+
+def online():
+    """Brings the site back after offline() is called."""
+    raise NotImplemented('This is on the wishlist.')
+
+def restart():
+    sudo('/etc/init.d/apache2 restart')
+    sudo('/etc/init.d/lighttpd restart')
