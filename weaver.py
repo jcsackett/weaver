@@ -38,29 +38,44 @@ def load_settings():
     
     config.project = getattr(settings, 'PROJECT_HOME')
     config.code = getattr(settings, 'CODE_HOME')
+    config.user = getattr(settings, 'USER')
+    config.repo = getattr(settings, 'REPO')
+    config.repo_type = getattr(settings, 'REPO_TYPE')
     
-    config.url = getattr(settings, 'SITE_URL')
+    config.url = getattr(settings, 'URL')
     config.url = dict(
         staging='^%s$' % '\.'.join(config.url[0].split('.')),
         internal='^%s$' % '\.'.join(config.url[1].split('.')),
         production='^%s$' % '\.'.join(config.url[2].split('.')),
     )
-    config.port = getattr(settings, 'APACHE_PORT')
+    config.port = getattr(settings, 'PORT')
     config.port = dict(
         staging=config.port[0],
         internal=config.port[1],
         production=config.port[2]
+    )
+    config.admin = getattr(settings, 'ADMIN')
+    config.admin = dict(
+        staging=config.admin[0],
+        internal=config.admin[1],
+        production=config.admin[2]
+    )
+    config.django_process = getattr(settings, 'DJANGO_PROCESS')
+    config.django_process = dict(
+        staging=config.django_process[0],
+        internal=config.django_process[1],
+        production=config.django_process[2]
     )
 
 def scripts():
     os.mkdir('scripts')
     
     template = env.get_template('scripts/setup_directories.sh.tmpl')
-    content = template.render(PROJECT=config.project)
+    content = template.render(project=config.project)
     file(os.path.join('scripts', 'setup_directories.sh'), 'w').write(content)
     
     template = env.get_template('scripts/setup_syslinks.sh.tmpl')
-    content = template.render(PROJECT=config.project, CODE=config.code)
+    content = template.render(project=config.project, code=config.code)
     file(os.path.join('scripts', 'setup_syslinks.sh'), 'w').write(content)
 
 def conf():
@@ -84,6 +99,28 @@ def conf():
     file(os.path.join('conf', 'production', filename), 'w').write(production_content)
     file(os.path.join('conf', 'internal', filename), 'w').write(internal_content)
     
+    template = env.get_template('conf/apache.tmpl')
+    staging_content = template.render(project=config.project,
+                                      port=config.port['staging'],
+                                      djangoprocess=config.django_process['staging'],
+                                      admin=config.admin['staging'],
+                                      code=config.code)
+    production_content = template.render(project=config.project,
+                                         port=config.port['production'],
+                                         djangoprocess=config.django_process['production'],
+                                         admin=config.admin['production'],
+                                         code=config.code)
+    internal_content = template.render(project=config.project,
+                                       port=config.port['internal'],
+                                       djangoprocess=config.django_process['internal'],
+                                       admin=config.admin['internal'],
+                                       code=config.code)
+    filename = '%s' % config.project
+    file(os.path.join('conf', 'staging', filename), 'w').write(staging_content)
+    file(os.path.join('conf', 'production', filename), 'w').write(production_content)
+    file(os.path.join('conf', 'internal', filename), 'w').write(internal_content)
+                                       
+
 commands = {
     'init':init,
     'build':build
@@ -93,7 +130,8 @@ if __name__ == '__main__':
     cmd = sys.argv[1]
     args = sys.argv[2:]
     
-    try:
-        commands[cmd](args)
-    except KeyError:
+    c = commands.get(cmd, None)
+    if c is None:
         print '%s is not a weaver command.' % cmd
+    else:
+        c(args)
