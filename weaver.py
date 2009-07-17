@@ -4,6 +4,8 @@ import os
 import shutil
 from jinja2 import Environment, FileSystemLoader
 
+from utils import get_setting
+
 WEAVER_DIR = os.path.dirname(os.path.abspath(__file__))
 env = Environment(loader=FileSystemLoader(os.path.join(WEAVER_DIR, 'templates')))
 
@@ -12,6 +14,12 @@ class WeaverConfig(object):
     pass
 
 config = WeaverConfig()
+
+repo_types = dict(
+    'git':'git clone',
+    'svn':'svn co',
+    'hg':'hg clone'
+)
 
 def init(args):
     target_dir = args[0]
@@ -36,36 +44,17 @@ def load_settings():
     sys.path += [working_dir]
     import settings
     
-    config.project = getattr(settings, 'PROJECT_HOME')
-    config.code = getattr(settings, 'CODE_HOME')
-    config.user = getattr(settings, 'USER')
-    config.repo = getattr(settings, 'REPO')
-    config.repo_type = getattr(settings, 'REPO_TYPE')
-    
-    config.url = getattr(settings, 'URL')
-    config.url = dict(
-        staging='^%s$' % '\.'.join(config.url[0].split('.')),
-        internal='^%s$' % '\.'.join(config.url[1].split('.')),
-        production='^%s$' % '\.'.join(config.url[2].split('.')),
-    )
-    config.port = getattr(settings, 'PORT')
-    config.port = dict(
-        staging=config.port[0],
-        internal=config.port[1],
-        production=config.port[2]
-    )
-    config.admin = getattr(settings, 'ADMIN')
-    config.admin = dict(
-        staging=config.admin[0],
-        internal=config.admin[1],
-        production=config.admin[2]
-    )
-    config.django_process = getattr(settings, 'DJANGO_PROCESS')
-    config.django_process = dict(
-        staging=config.django_process[0],
-        internal=config.django_process[1],
-        production=config.django_process[2]
-    )
+    config.project = get_setting(settings, 'PROJECT_HOME')
+    config.code = get_setting(settings, 'CODE_HOME')
+    config.user = get_setting(settings, 'USER')
+    config.repo = get_setting(settings, 'REPO')
+    config.repo_type = get_setting(settings, 'REPO_TYPE')
+    config.url = get_setting(settings, 'URL', lambda x: '\.'.join(x.split('.')))
+    config.port = get_setting(settings, 'PORT')
+    config.admin = get_setting(settings, 'ADMIN')
+    config.django_process = get_setting(settings, 'DJANGO_PROCESS')
+    config.repo = get_setting(settings, 'REPO')
+    config.repo_cmd = get_settings(settings, 'REPO_TYPE',lambda x: repo_types[x])
 
 def scripts():
     os.mkdir('scripts')
