@@ -1,8 +1,26 @@
-This project is highly geared towards my usage right now. As such it makes certain assumptions.
+WEAVER
+
+Weaver is a simple system to help create the necessary bits and pieces for a particular type of fabric based deployment.
+
+ABOUT
+
+Weaver was created to 1) scratch an itch 2) help my deploys. As such it is curretnly highly geared towards my needs, but will hopefully become more useful over time.
+
+As a result of its being geared directly towards my usage, it makes a couple of assumptions:
 
 1) You will deploy along the same directory structure on every server.
 2) You will have set up every server with the same username for administration
-3) You will be using lighty as a proxy to handle static media and pass off to apache for django
+3) You will be using lighttpd as a proxy to handle static media and pass off to apache for django
 4) You will be using mod_wsgi
 5) You have three servers: one for internal usage, one for staging, and one for external production usage
-6) You will apache and lighttpd both setup with user/group of www-data
+6) You will have apache and lighttpd both setup with user/group of www-data
+
+REQUIREMENTS
+
+Python (built and tested with python 2.5)
+Jinja2
+Fabric 0.1.1 (You don't actually need this to run weaver, but weaver builds a fabfile for use with it, so weaver is pretty useless without it).
+
+LICENSE
+
+This released under the BSD License.
