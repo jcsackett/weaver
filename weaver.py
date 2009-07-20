@@ -16,9 +16,9 @@ class WeaverConfig(object):
 config = WeaverConfig()
 
 repo_types = dict(
-    'git':'git clone',
-    'svn':'svn co',
-    'hg':'hg clone'
+    git='git clone',
+    svn='svn co',
+    hg='hg clone'
 )
 
 def init(args):
@@ -38,6 +38,7 @@ def build(args):
     load_settings()
     scripts()
     conf()
+    fabfile()
 
 def load_settings():
     working_dir = os.getcwd()
@@ -47,6 +48,7 @@ def load_settings():
     config.project = get_setting(settings, 'PROJECT_HOME')
     config.code = get_setting(settings, 'CODE_HOME')
     config.user = get_setting(settings, 'USER')
+    config.server = get_setting(settings, 'SERVER')
     config.repo = get_setting(settings, 'REPO')
     config.repo_type = get_setting(settings, 'REPO_TYPE')
     config.url = get_setting(settings, 'URL', lambda x: '\.'.join(x.split('.')))
@@ -54,7 +56,10 @@ def load_settings():
     config.admin = get_setting(settings, 'ADMIN')
     config.django_process = get_setting(settings, 'DJANGO_PROCESS')
     config.repo = get_setting(settings, 'REPO')
-    config.repo_cmd = get_settings(settings, 'REPO_TYPE',lambda x: repo_types[x])
+    config.repo_cmd = get_setting(settings, 'REPO_TYPE',lambda x: repo_types[x])
+    config.db = get_setting(settings, 'MYSQL_DB')
+    config.db_user = get_setting(settings, 'MYSQL_USER')
+    config.db_password = get_setting(settings, 'MYSQL_PASSWORD')
 
 def scripts():
     os.mkdir('scripts')
@@ -66,6 +71,26 @@ def scripts():
     template = env.get_template('scripts/setup_syslinks.sh.tmpl')
     content = template.render(project=config.project, code=config.code)
     file(os.path.join('scripts', 'setup_syslinks.sh'), 'w').write(content)
+
+def fabfile():
+    template = env.get_template('fabfile.py.tmpl')
+    content = template.render(
+        project=config.project,
+        code=config.code,
+        repo=config.repo,
+        repo_cmd=config.repo_cmd,
+        db=config.db,
+        staging='%s@%s' % (config.user, config.server['staging']),
+        staging_db_user=config.db_user['staging'],
+        staging_db_password=config.db_password['staging'],
+        internal='%s@%s' % (config.user, config.server['internal']),
+        internal_db_user=config.db_user['internal'],
+        internal_db_password=config.db_password['internal'],
+        production='%s@%s' % (config.user, config.server['production']),
+        production_db_user=config.db_user['production'],
+        production_db_password=config.db_password['production'],
+    )
+    file('fabfile.py', 'w').write(content)
 
 def conf():
     os.mkdir('conf')
@@ -108,11 +133,17 @@ def conf():
     file(os.path.join('conf', 'staging', filename), 'w').write(staging_content)
     file(os.path.join('conf', 'production', filename), 'w').write(production_content)
     file(os.path.join('conf', 'internal', filename), 'w').write(internal_content)
-                                       
+
+def reset(args):
+    os.remove('fabfile.py')
+    os.remove('settings.pyc')
+    shutil.rmtree('conf')
+    shutil.rmtree('scripts')                                       
 
 commands = {
     'init':init,
-    'build':build
+    'build':build, 
+    'reset':reset
 }
 
 if __name__ == '__main__':

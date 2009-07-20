@@ -3,10 +3,12 @@
 class SettingsError(Exception):
     pass
 
-def get_setting(setting_name, setting_mod, transform=lambda x: x):
+def get_setting(setting_mod, setting_name, transform=lambda x: x):
     setting = getattr(setting_mod, setting_name)
+    #if the setting is just a string, we know it stays the same across servers
     if type(setting) == str:
         return transform(setting)
+    #tuples, however, mean the setting changes from server to server
     elif type(setting) == tuple:
         setting = dict(
             staging=transform(setting[0]),

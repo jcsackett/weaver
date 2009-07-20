@@ -1,21 +1,21 @@
-config.fab_hosts = [{{staging}}, {{production}}, {{internal}}]
+config.fab_hosts = ['{{staging}}', '{{production}}', '{{internal}}']
 
 def internal():
-    config.fab_hosts = [{{internal}}]
-    config.db_user = {{internal_db_user}}
-    config.db_password = {internal_db_password}}
+    config.fab_hosts = ['{{internal}}']
+    config.db_user = '{{internal_db_user}}'
+    config.db_password = '{{internal_db_password}}'
     config.conf = 'internal'
     
 def staging():
-    config.fab_hosts = [{{staging}}]
-    config.db_user = {{staging_db_user}}
-    config.db_password = {{staging_db_password}}
+    config.fab_hosts = ['{{staging}}']
+    config.db_user = '{{staging_db_user}}'
+    config.db_password = '{{staging_db_password}}'
     config.conf = 'staging'
     
 def production():
-    config.fab_hosts = [{{production}}]
-    config.db_user = {{production_db_user}}
-    config.db_password = {{production_db_password}}
+    config.fab_hosts = ['{{production}}']
+    config.db_user = '{{production_db_user}}'
+    config.db_password = '{{production_db_password}}'
     config.conf = 'production'
     
 def init():
