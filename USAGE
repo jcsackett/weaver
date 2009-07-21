@@ -1,0 +1,32 @@
+Example usage:
+
+you@server$ ls
+weaver
+you@server$ ./weaver/weaver.py wtest
+you@server$ ls
+weaver	wtest
+you@server$ cd wtest
+you@server$ ls
+settings.py
+you@server$ vim setting.py
+
+# ... do some changes to the generated empty variables
+
+you@server$ ../weaver/weaver.py build
+you@server$ ls -R
+conf	fabfile.py	scripts		settings.py		settings.pyc
+
+./conf:
+internal		production		staging
+
+./conf/internal:
+99-test.conf		test
+
+./conf/production:
+99-test.conf		test
+
+./conf/staging:
+99-test.conf		test
+
+./scripts:
+setup_directories.sh	setup_syslinks.sh
